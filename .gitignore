@@ -1,0 +1,15 @@
+node_modules/
+data/*.sqlite
+data/*.db
+data/*.sqlite-shm
+data/*.sqlite-wal
+data/backups/
+public/uploads/
+.env*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.*
+.DS_Store
