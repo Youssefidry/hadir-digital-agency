@@ -57,9 +57,11 @@
   .hero{
     position:relative;color:#fff;
     background:
-      linear-gradient(100deg,rgba(23,10,50,.88) 0%,rgba(35,15,70,.78) 45%,rgba(60,25,110,.38) 100%),
-      url('https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=1600&q=80') center/cover no-repeat;
+      radial-gradient(900px 420px at 85% -10%,rgba(139,92,246,.35),transparent 60%),
+      radial-gradient(700px 380px at 0% 110%,rgba(109,40,217,.28),transparent 60%),
+      linear-gradient(100deg,#170a32 0%,#231046 45%,#341a5e 100%);
   }
+  .hero::before{content:'';position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(rgba(255,255,255,.06) 1px,transparent 1px);background-size:26px 26px}
   .hero-inner{display:grid;grid-template-columns:1.05fr 1fr;gap:40px;align-items:center;padding:60px 20px 130px}
   .hero h1{font-size:38px;font-weight:900;line-height:1.5;margin-bottom:18px}
   .hero h1 .hl{background:linear-gradient(90deg,#c4b5fd,#a78bfa);-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -185,15 +187,7 @@
   form .btn{width:100%;justify-content:center}
   #formToast.show{opacity:1;transform:none}
 
-  /* ---------- Testimonials ---------- */
-  .tst-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-  .tst{background:#fff;border:1px solid #f0ecfb;border-radius:16px;padding:26px;box-shadow:0 12px 30px -16px rgba(44,37,84,.12)}
-  .tst-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-  .tst-head h4{font-size:16px;font-weight:800;color:#2c2554}
-  .tst-head small{display:block;font-size:11.5px;color:#a29bc4;font-weight:500}
-  .stars{color:#f59e0b;font-size:14px;letter-spacing:2px}
-  .tst p{font-size:14px;color:#6f6a8e}
-  .process-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;list-style:none}
+  /* ---------- CTA + FAQ ---------- */;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;list-style:none}
   .process-card{min-width:0;padding:22px 20px;border:1px solid #eee9fb;border-radius:16px;background:#fff;box-shadow:0 10px 26px -20px rgba(44,37,84,.28)}
   .process-number{display:grid;place-items:center;width:38px;height:38px;margin-bottom:16px;border-radius:12px;background:var(--purple-light);color:var(--purple);font-weight:900}
   .process-card h3{margin-bottom:6px;color:#2c2554;font-size:17px;font-weight:800}
@@ -228,6 +222,8 @@
   .socials a:hover{background:var(--purple)}
   .contact-line{display:flex;align-items:center;gap:10px;font-size:13.5px;color:#b4abdc;direction:ltr;justify-content:flex-start;margin-bottom:12px;min-height:22px}
   .contact-line .contact-text{direction:ltr;unicode-bidi:plaintext;text-align:left;overflow-wrap:anywhere}
+  .contact-line a.contact-text{transition:.2s}
+  .contact-line a.contact-text:hover{color:#fff;text-decoration:underline;text-underline-offset:3px}
   .contact-line .contact-text.js-address{direction:rtl;text-align:right}
   .contact-line[hidden]{display:none}
   .contact-setup-note[hidden]{display:none}
@@ -235,6 +231,10 @@
   .contact-setup-note{margin-top:12px;font-size:12px;color:#a89fd4}
   .foot-bottom{border-top:1px solid rgba(255,255,255,.08);padding:18px 0;text-align:center;font-size:13px;color:#9c93c9}
   .to-top{position:fixed;bottom:24px;left:24px;z-index:90;width:46px;height:46px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;font-size:18px;box-shadow:0 10px 26px -8px rgba(124,58,237,.6);display:flex;align-items:center;justify-content:center}
+  .wa-float{position:fixed;bottom:82px;left:24px;z-index:90;width:46px;height:46px;border-radius:50%;background:#25d366;color:#fff;box-shadow:0 10px 26px -8px rgba(37,211,102,.65);display:flex;align-items:center;justify-content:center;transition:.25s}
+  .wa-float .ic-svg{width:23px;height:23px}
+  .wa-float:hover{transform:translateY(-2px) scale(1.05)}
+  .wa-float[hidden]{display:none}
 
   /* ---------- Responsive ---------- */
   @media(max-width:992px){
@@ -270,7 +270,8 @@
     .nav .quote-link{padding:10px 12px}
     .nav .quote-link .ic-svg{width:17px;height:17px}
     .nav .quote-link-text{display:inline}
-    .hero{background:linear-gradient(160deg,#160d2c 0%,#241342 58%,#34205c 100%)}
+    .hero{background:radial-gradient(600px 300px at 80% -5%,rgba(139,92,246,.4),transparent 60%),linear-gradient(160deg,#160d2c 0%,#241342 58%,#34205c 100%)}
+    .hero-arrow{display:none}
     .hero-inner{padding:38px 20px 110px}
     .hero h1{font-size:28px}
     .mockup{height:300px;width:100%;max-width:440px;margin:8px auto 0}

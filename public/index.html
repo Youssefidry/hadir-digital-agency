@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/site.css?v=14">
+<link rel="stylesheet" href="/css/site.css?v=15">
 </head>
 <body>
 <!-- SVG sprite -->
@@ -75,7 +75,7 @@
       </ul>
       <div class="hero-cta">
         <span class="hero-arrow"><svg class="ic-svg"><use href="#i-arrow-curve"/></svg></span>
-        <a href="#contactForm" class="btn btn-purple btn-lg"><svg class="ic-svg"><use href="#i-send"/></svg> اطلب عرض السعر الآن</a>
+        <a class="btn btn-purple btn-lg" href="#contactForm"><svg class="ic-svg"><use href="#i-send"/></svg> اطلب عرض السعر الآن</a>
       </div>
       <p class="hero-note">اختر نوع الموقع وأرسل نبذة عن احتياجك لنراجع النطاق ونعدّ عرض السعر.</p>
     </div>
@@ -311,9 +311,10 @@
   <div class="container foot-main">
     <div>
       <h4>تواصل معنا</h4>
-      <div class="contact-line"><svg class="ic-svg"><use href="#i-phone"/></svg><span class="contact-text js-phone">+212 6 12 34 56 78</span></div>
-      <div class="contact-line"><svg class="ic-svg"><use href="#i-mail"/></svg><span class="contact-text js-email">contact@hadir.ma</span></div>
-      <div class="contact-line"><svg class="ic-svg"><use href="#i-pin"/></svg><span class="contact-text js-address">المغرب - الرباط</span></div>
+      <div class="contact-line"><svg class="ic-svg"><use href="#i-phone"/></svg><span class="contact-text js-phone"></span></div>
+      <div class="contact-line"><svg class="ic-svg"><use href="#i-mail"/></svg><span class="contact-text js-email"></span></div>
+      <div class="contact-line js-whatsapp-line" hidden><svg class="ic-svg"><use href="#i-whatsapp"/></svg><span class="contact-text js-whatsapp"></span></div>
+      <div class="contact-line"><svg class="ic-svg"><use href="#i-pin"/></svg><span class="contact-text js-address"></span></div>
       <p class="contact-setup-note" hidden>حدّث بيانات التواصل من لوحة الإدارة قبل استقبال العملاء.</p>
     </div>
     <div>
@@ -351,7 +352,9 @@
 
 <button class="to-top" type="button" aria-label="الرجوع إلى أعلى الصفحة" onclick="window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})"><svg class="ic-svg" aria-hidden="true"><use href="#i-chev-up"/></svg></button>
 
-<script src="/js/app.js?v=3" defer></script>
+<a class="wa-float js-whatsapp-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="تواصل معنا عبر واتساب" hidden><svg class="ic-svg" aria-hidden="true"><use href="#i-whatsapp"/></svg></a>
+
+<script src="/js/app.js?v=4" defer></script>
 <script>
 function scrollTpl(dir){
   const row=document.getElementById('tplRow');

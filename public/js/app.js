@@ -34,8 +34,12 @@ async function initSite() {
     const {settings={},services=[],projects=[]}=await HadirAPI.request('/api/public');
     document.querySelectorAll('.js-brand').forEach(el=>el.textContent=settings.siteName||'Hadir');
     document.querySelectorAll('.js-tagline').forEach(el=>el.textContent=settings.tagline||'Digital Agency');
-    document.querySelectorAll('.js-phone').forEach(el=>{el.textContent=settings.phone||'';const line=el.closest('.contact-line');if(line)line.hidden=!settings.phone;});
-    document.querySelectorAll('.js-email').forEach(el=>{el.textContent=settings.email||'';const line=el.closest('.contact-line');if(line)line.hidden=!settings.email;});
+    document.querySelectorAll('.js-phone').forEach(el=>{const digits=(settings.phone||'').replace(/[^+0-9]/g,'');el.textContent=settings.phone||'';const line=el.closest('.contact-line');if(line){const a=document.createElement('a');a.className='contact-text js-phone';a.href=settings.phone?('tel:'+digits.replace(/\s/g,'')):'#';a.textContent=settings.phone||'';el.replaceWith(a);line.hidden=!settings.phone;}});
+    document.querySelectorAll('.js-email').forEach(el=>{el.textContent=settings.email||'';const line=el.closest('.contact-line');if(line){const a=document.createElement('a');a.className='contact-text js-email';a.href=settings.email?('mailto:'+settings.email):'#';a.textContent=settings.email||'';el.replaceWith(a);line.hidden=!settings.email;}});
+    const waDigits=(settings.whatsapp||'').replace(/\D/g,'');
+    const waHref=waDigits?('https://wa.me/'+waDigits):'';
+    document.querySelectorAll('.js-whatsapp').forEach(el=>{el.textContent=settings.whatsapp||'';const line=el.closest('.contact-line');if(line){if(waHref){const a=document.createElement('a');a.className='contact-text js-whatsapp';a.href=waHref;a.target='_blank';a.rel='noopener';a.textContent=settings.whatsapp;el.replaceWith(a);}line.hidden=!waHref;}});
+    const waFloat=document.getElementById('waFloat');if(waFloat){waFloat.hidden=!waHref;if(waHref)waFloat.href=waHref;}
     document.querySelectorAll('.js-address').forEach(el=>{el.textContent=settings.address||'';const line=el.closest('.contact-line');if(line)line.hidden=!settings.address;});
     const contactNote=document.querySelector('.contact-setup-note');
     if(contactNote)contactNote.hidden=Boolean(settings.phone||settings.email||settings.address);
