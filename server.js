@@ -222,7 +222,7 @@ const server=createServer(async(req,res)=>{
    const file=path==='/'?resolve(PUBLIC_DIR,'index.html'):resolve(PUBLIC_DIR,'.'+path);
    if(file!==PUBLIC_DIR&&!file.startsWith(PUBLIC_DIR+sep))return fail(res,403,'ممنوع');
    if(!existsSync(file))return fail(res,404,'الملف غير موجود');
-   res.writeHead(200,{'Content-Type':mime[extname(file).toLowerCase()]||'application/octet-stream','X-Content-Type-Options':'nosniff'});return createReadStream(file).pipe(res);
+   res.writeHead(200,{'Content-Type':mime[extname(file).toLowerCase()]||'application/octet-stream','X-Content-Type-Options':'nosniff','Cache-Control':extname(file).toLowerCase()==='.html'?'no-store':'public, max-age=300'});return createReadStream(file).pipe(res);
   }
   return fail(res,404,'المسار غير موجود');
  }catch(e){console.error(e);if(!res.headersSent)return fail(res,e.status||500,e.status?e.message:'خطأ داخلي في الخادم');res.destroy();}
