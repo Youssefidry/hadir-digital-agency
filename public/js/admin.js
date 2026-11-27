@@ -103,8 +103,35 @@ $('projectCancel').addEventListener('click',resetProject);
 $('projectList').addEventListener('click',async e=>{const b=e.target.closest('button[data-action]');if(!b)return;const id=Number(b.dataset.id),p=state.projects.find(x=>x.id===id);if(b.dataset.action==='move-project'){try{await moveItem('project',id,Number(b.dataset.dir));}catch(error){notice(error.message);}return;}if(b.dataset.action==='edit-project'&&p){clearProjectPreview();$('projectId').value=p.id;$('projectTitle').value=p.title;$('projectCategory').value=p.cat;$('projectImage').value=p.img;$('projectImagePreview').src=p.img;$('projectImagePreview').classList.remove('hidden');$('projectTags').value=p.tags;$('projectColor').value=p.btn;$('projectFormTitle').textContent='✏️ تعديل العمل';$('projectForm').scrollIntoView({behavior:'smooth',block:'start'});}if(b.dataset.action==='delete-project'&&confirm('حذف العمل؟'))try{await AdminAPI.request(`/api/admin/projects/${id}`,{method:'DELETE'});await loadProjects();await loadDashboard();notice('تم حذف العمل');}catch(err){notice(err.message);}});
 $('projectForm').addEventListener('submit',async e=>{e.preventDefault();const id=$('projectId').value;try{const body={title:$('projectTitle').value.trim(),cat:$('projectCategory').value.trim(),img:await uploadProjectImage(),tags:$('projectTags').value.trim(),btn:$('projectColor').value};await AdminAPI.request(id?`/api/admin/projects/${id}`:'/api/admin/projects',{method:id?'PUT':'POST',body:JSON.stringify(body)});await resetProject();await loadProjects();await loadDashboard();notice('تم حفظ العمل');}catch(err){notice(err.message);}});
 
-async function loadSettings(){const data=await AdminAPI.request('/api/admin/settings');state.settings=data.settings||{};for(const [key,id] of Object.entries({siteName:'settingSiteName',tagline:'settingTagline',phone:'settingPhone',email:'settingEmail',whatsapp:'settingWhatsapp',address:'settingAddress',about:'settingAbout'}))$(id).value=state.settings[key]||'';}
-$('settingsForm').addEventListener('submit',async e=>{e.preventDefault();const settings={};for(const [key,id]of Object.entries({siteName:'settingSiteName',tagline:'settingTagline',phone:'settingPhone',email:'settingEmail',whatsapp:'settingWhatsapp',address:'settingAddress',about:'settingAbout'}))settings[key]=$(id).value.trim();try{await AdminAPI.request('/api/admin/settings',{method:'PUT',body:JSON.stringify(settings)});state.settings=settings;document.querySelectorAll('.brand-name').forEach(el=>{if(el.closest('.side-brand'))el.textContent=settings.siteName;});notice('تم حفظ إعدادات الموقع');}catch(err){notice(err.message);}});
+async function loadSettings(){const data=await AdminAPI.request('/api/admin/settings');state.settings=data.settings||{};for(const [key,id] of Object.entries({siteName:'settingSiteName',tagline:'settingTagline',phone:'settingPhone',email:'settingEmail',whatsapp:'settingWhatsapp',address:'settingAddress',about:'settingAbout'}))$(id).value=state.settings[key]||'';
+  const DEFAULT_ICON='/assets/hadir-icon.svg';
+  const lp=$('logoPreview'),fp=$('faviconPreview');
+  if(lp)lp.src=state.settings.logo||DEFAULT_ICON;if(fp)fp.src=state.settings.favicon||DEFAULT_ICON;
+  applyBrand();
+}
+function applyBrand(){const DEFAULT_ICON='/assets/hadir-icon.svg';const logo=state.settings.logo||DEFAULT_ICON,icon=state.settings.favicon||DEFAULT_ICON;
+  document.querySelectorAll('.brand-mark img,.logo-mark img').forEach(img=>{img.src=logo;});
+  document.querySelectorAll('.brand-name').forEach(el=>{if(el.closest('.side-brand'))el.textContent=state.settings.siteName||'Hadir';});
+  const link=document.querySelector('link[rel="icon"]');if(link)link.href=icon;
+}
+function settingsPayload(){const s={};for(const [key,id]of Object.entries({siteName:'settingSiteName',tagline:'settingTagline',phone:'settingPhone',email:'settingEmail',whatsapp:'settingWhatsapp',address:'settingAddress',about:'settingAbout'}))s[key]=$(id).value.trim();s.logo=state.settings.logo||'';s.favicon=state.settings.favicon||'';return s;}
+async function saveSettings(payload,message){await AdminAPI.request('/api/admin/settings',{method:'PUT',body:JSON.stringify(payload)});state.settings={...state.settings,...payload};applyBrand();if(message)notice(message);}
+$('settingsForm').addEventListener('submit',async e=>{e.preventDefault();try{await saveSettings(settingsPayload(),'تم حفظ إعدادات الموقع');}catch(err){notice(err.message);}});
+async function pickIdentity(file,kind){
+  if(!file)return;
+  if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>4*1024*1024)return notice('اختر صورة PNG أو JPG أو WebP بحجم لا يتجاوز 4 MB');
+  try{const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('تعذرت قراءة الملف'));reader.readAsDataURL(file);});
+    const res=await AdminAPI.request('/api/admin/uploads',{method:'POST',body:JSON.stringify({data})});
+    await saveSettings({...settingsPayload(),[kind]:res.url},kind==='logo'?'تم تحديث شعار الموقع':'تم تحديث أيقونة الصفحة');
+    $(kind==='logo'?'logoPreview':'faviconPreview').src=res.url;
+  }catch(err){notice(err.message);}
+}
+$('logoPick').addEventListener('click',()=>$('logoFile').click());
+$('logoFile').addEventListener('change',e=>{pickIdentity(e.target.files[0],'logo').finally(()=>{$('logoFile').value='';});});
+$('logoClear').addEventListener('click',async()=>{try{await saveSettings({...settingsPayload(),logo:''},'أعيد الشعار الافتراضي');}catch(err){notice(err.message);}});
+$('faviconPick').addEventListener('click',()=>$('faviconFile').click());
+$('faviconFile').addEventListener('change',e=>{pickIdentity(e.target.files[0],'favicon').finally(()=>{$('faviconFile').value='';});});
+$('faviconClear').addEventListener('click',async()=>{try{await saveSettings({...settingsPayload(),favicon:''},'أعيدت الأيقونة الافتراضية');}catch(err){notice(err.message);}});
 $('passwordForm').addEventListener('submit',async e=>{e.preventDefault();if($('newPassword').value!==$('confirmNewPassword').value){notice('كلمتا المرور الجديدتان غير متطابقتين');return;}try{await AdminAPI.request('/api/auth/password',{method:'POST',body:JSON.stringify({currentPassword:$('currentPassword').value,newPassword:$('newPassword').value})});$('passwordForm').reset();notice('تم تحديث كلمة المرور بنجاح');}catch(err){notice(err.message);}});
 async function loadBackups(){const data=await AdminAPI.request('/api/admin/backups');const list=$('backupList');list.innerHTML=data.items.length?data.items.map(name=>`<a class="backup-item" href="/api/admin/backups/${encodeURIComponent(name)}">⬇️ ${escAdmin(name)}</a>`).join(''):'<small class="muted">لا توجد نسخ احتياطية بعد.</small>';}
 $('createBackupBtn').addEventListener('click',async e=>{const button=e.currentTarget;button.disabled=true;try{const data=await AdminAPI.request('/api/admin/backups',{method:'POST',body:'{}'});await loadBackups();const link=document.createElement('a');link.href=`/api/admin/backups/${encodeURIComponent(data.name)}`;link.download=data.name;link.click();notice('تم إنشاء النسخة الاحتياطية وتنزيلها');}catch(error){notice(error.message);}finally{button.disabled=false;}});
