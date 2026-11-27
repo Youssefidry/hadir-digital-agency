@@ -45,7 +45,7 @@ $('authForm').addEventListener('submit',async e=>{
   finally{$('authButton').disabled=false;}
 });
 async function showAdmin(){
-  $('loginScreen').style.display='none';$('app').style.display='block';$('adminName').textContent=`مرحباً، ${state.username}`;
+  $('loginScreen').style.display='none';$('app').style.display='block';$('adminName').textContent=`مرحباً، ${state.username}`;const av=$('userAvatar');if(av)av.textContent=(state.username[0]||'ح').toUpperCase();
   try{await loadAll();await loadBackups();}catch(error){notice(error.message);}
 }
 $('logoutBtn').addEventListener('click',async()=>{try{await AdminAPI.request('/api/auth/logout',{method:'POST'});}catch{}location.reload();});
