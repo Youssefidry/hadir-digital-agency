@@ -187,11 +187,19 @@
   form .btn{width:100%;justify-content:center}
   #formToast.show{opacity:1;transform:none}
 
-  /* ---------- CTA + FAQ ---------- */;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;list-style:none}
-  .process-card{min-width:0;padding:22px 20px;border:1px solid #eee9fb;border-radius:16px;background:#fff;box-shadow:0 10px 26px -20px rgba(44,37,84,.28)}
-  .process-number{display:grid;place-items:center;width:38px;height:38px;margin-bottom:16px;border-radius:12px;background:var(--purple-light);color:var(--purple);font-weight:900}
-  .process-card h3{margin-bottom:6px;color:#2c2554;font-size:17px;font-weight:800}
-  .process-card p{color:#6f6a8e;font-size:14px}
+  /* ---------- Process timeline ---------- */
+  .process-timeline{list-style:none;max-width:660px;margin:0 auto;position:relative;padding-right:44px}
+  .process-timeline::before{content:'';position:absolute;top:10px;bottom:10px;right:19px;width:2px;border-radius:2px;background:linear-gradient(180deg,#a78bfa,#6d28d9 55%,#ede9fe)}
+  .process-step{position:relative;padding:18px 22px;border-radius:16px;margin-bottom:14px;box-shadow:0 10px 26px -20px rgba(44,37,84,.35);transition:.25s}
+  .process-step:hover{transform:translateX(-4px)}
+  .process-step:last-child{margin-bottom:0}
+  .process-step:nth-child(1){background:#eef2ff}
+  .process-step:nth-child(2){background:#fff7ed}
+  .process-step:nth-child(3){background:#f0fdf4}
+  .process-step:nth-child(4){background:#fdf2f8}
+  .process-number{position:absolute;top:16px;right:-44px;width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);color:#fff;display:grid;place-items:center;font-weight:900;box-shadow:0 6px 16px -6px rgba(109,40,217,.55);border:3px solid #fff}
+  .process-body h3{margin-bottom:4px;color:#2c2554;font-size:17px;font-weight:800}
+  .process-body p{color:#6f6a8e;font-size:14px}
 
   /* ---------- CTA + FAQ ---------- */
   .cta-faq{display:grid;grid-template-columns:1.05fr 1fr;gap:26px;align-items:stretch}
@@ -253,7 +261,6 @@
     .svc-grid{grid-template-columns:repeat(2,1fr)}
     .panel-grid,.cta-faq{grid-template-columns:1fr}
     .tst-row{grid-template-columns:1fr}
-    .process-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
     .tpl{width:calc((100% - 40px)/3)}
     .foot-main{grid-template-columns:1fr 1fr}
   }
@@ -287,7 +294,6 @@
     .phone-screen{padding:9px 8px}
     .phone-screen img{height:68px}
     .svc-grid{grid-template-columns:1fr}
-    .process-grid{grid-template-columns:1fr}
     .tpl{width:85%}
     form .row{grid-template-columns:1fr}
     .foot-main{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 18px;padding:36px 20px 28px}
