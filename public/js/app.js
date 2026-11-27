@@ -13,23 +13,6 @@ async function initSite() {
   const year=document.querySelector('.current-year');
   if(year)year.textContent=new Date().getFullYear();
 
-  const menuButton=document.querySelector('.menu-toggle');
-  const primaryNav=document.getElementById('primaryNav');
-  if(menuButton&&primaryNav){
-    const setMenuOpen=open=>{
-      primaryNav.classList.toggle('open',open);
-      menuButton.setAttribute('aria-expanded',String(open));
-      menuButton.setAttribute('aria-label',open?'إغلاق قائمة التنقل':'فتح قائمة التنقل');
-    };
-    menuButton.addEventListener('click',()=>setMenuOpen(menuButton.getAttribute('aria-expanded')!=='true'));
-    primaryNav.addEventListener('click',event=>{if(event.target.closest('a'))setMenuOpen(false);});
-    document.addEventListener('keydown',event=>{if(event.key==='Escape')setMenuOpen(false);});
-    document.addEventListener('click',event=>{
-      if(menuButton.getAttribute('aria-expanded')==='true'&&!primaryNav.contains(event.target)&&!menuButton.contains(event.target))setMenuOpen(false);
-    });
-    window.matchMedia('(min-width: 993px)').addEventListener('change',event=>{if(event.matches)setMenuOpen(false);});
-  }
-
   try {
     const {settings={},services=[],projects=[]}=await HadirAPI.request('/api/public');
     document.querySelectorAll('.js-brand').forEach(el=>el.textContent=settings.siteName||'Hadir');

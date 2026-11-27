@@ -13,7 +13,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/site.css?v=16">
+<link rel="stylesheet" href="/vendor/bootstrap.rtl.min.css">
+<link rel="stylesheet" href="/css/site.css?v=17">
 </head>
 <body>
 <!-- SVG sprite -->
@@ -37,27 +38,29 @@
 <a class="skip-link" href="#main-content">تجاوز إلى المحتوى</a>
 <!-- ===== Header ===== -->
 <header>
-  <div class="container nav">
-    <button class="menu-toggle" type="button" aria-label="فتح قائمة التنقل" aria-expanded="false" aria-controls="primaryNav">
-      <svg class="ic-svg" aria-hidden="true"><use href="#i-menu"/></svg>
-    </button>
-    <a class="logo" href="#">
-      <span class="logo-mark"><img src="/assets/hadir-icon.svg" alt="شعار Hadir"></span>
-      <span class="logo-text"><b class="js-brand">Hadir</b><span class="js-tagline">Digital Agency</span></span>
-    </a>
-    <nav id="primaryNav" aria-label="التنقل الرئيسي">
-      <ul>
-        <li><a class="active" href="#">الرئيسية</a></li>
-        <li><a href="#services">خدماتنا</a></li>
-        <li><a href="#works">أعمالنا</a></li>
-        <li><a href="#why">عن الموقع</a></li>
-        <li><a href="#process">آلية العمل</a></li>
-        <li><a href="#faq">الأسئلة الشائعة</a></li>
-        <li><a href="#contact">تواصل معنا</a></li>
-      </ul>
-    </nav>
-    <a href="#contactForm" class="btn btn-purple quote-link" aria-label="اتصل بنا"><svg class="ic-svg" aria-hidden="true"><use href="#i-phone"/></svg><span class="quote-link-text">اتصل بنا</span></a>
-  </div>
+  <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <div class="container">
+      <a class="navbar-brand logo" href="#">
+        <span class="logo-mark"><img src="/assets/hadir-icon.svg" alt="شعار Hadir"></span>
+        <span class="logo-text"><b class="js-brand">Hadir</b><span class="js-tagline">Digital Agency</span></span>
+      </a>
+      <button class="navbar-toggler menu-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#primaryNav" aria-controls="primaryNav" aria-expanded="false" aria-label="فتح قائمة التنقل">
+        <svg class="ic-svg" aria-hidden="true"><use href="#i-menu"/></svg>
+      </button>
+      <div class="collapse navbar-collapse" id="primaryNav">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link active" aria-current="page" href="#">الرئيسية</a></li>
+          <li class="nav-item"><a class="nav-link" href="#services">خدماتنا</a></li>
+          <li class="nav-item"><a class="nav-link" href="#works">أعمالنا</a></li>
+          <li class="nav-item"><a class="nav-link" href="#why">عن الموقع</a></li>
+          <li class="nav-item"><a class="nav-link" href="#process">آلية العمل</a></li>
+          <li class="nav-item"><a class="nav-link" href="#faq">الأسئلة الشائعة</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">تواصل معنا</a></li>
+        </ul>
+        <a href="#contactForm" class="btn btn-purple quote-link" aria-label="اتصل بنا"><svg class="ic-svg" aria-hidden="true"><use href="#i-phone"/></svg><span class="quote-link-text">اتصل بنا</span></a>
+      </div>
+    </div>
+  </nav>
 </header>
 
 <main id="main-content">
@@ -88,15 +91,15 @@
             <div class="screen-btns"><span class="s1">ابدأ الآن</span><span class="s2">أعمالنا</span></div>
           </div>
           <div class="screen-grid">
-            <div class="card">
+            <div class="mini-card">
               <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=300&q=70" alt="" decoding="async">
               <div><b>مطاعم ومقاهي</b><span>قوائم رقمية وحجز</span><small>نموذج توضيحي</small></div>
             </div>
-            <div class="card">
+            <div class="mini-card">
               <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=300&q=70" alt="" loading="lazy" decoding="async">
               <div><b>مراكز تجميل</b><span>خدمات ومواعيد</span><small>نموذج توضيحي</small></div>
             </div>
-            <div class="card">
+            <div class="mini-card">
               <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=300&q=70" alt="" loading="lazy" decoding="async">
               <div><b>شركات ومكاتب</b><span>مواقع تعريفية</span><small>نموذج توضيحي</small></div>
             </div>
@@ -220,23 +223,23 @@
         <div class="row">
           <div class="field">
             <label class="req" for="contactName">الاسم الكامل *</label>
-            <input id="contactName" type="text" name="name" autocomplete="name" maxlength="100" required placeholder="الاسم الكامل">
+            <input id="contactName" type="text" name="name" autocomplete="name" class="form-control" maxlength="100" required placeholder="الاسم الكامل">
             <span class="fi">👤</span>
           </div>
           <div class="field">
             <label class="req" for="contactPhone">رقم الهاتف *</label>
-            <input id="contactPhone" type="tel" name="phone" autocomplete="tel" inputmode="tel" maxlength="40" required placeholder="رقم الهاتف / واتساب">
+            <input id="contactPhone" type="tel" name="phone" autocomplete="tel" inputmode="tel" class="form-control" maxlength="40" required placeholder="رقم الهاتف / واتساب">
             <span class="fi">📱</span>
           </div>
         </div>
         <div class="field">
           <label for="contactEmail">البريد الإلكتروني (اختياري)</label>
-          <input id="contactEmail" type="email" name="email" autocomplete="email" maxlength="180" placeholder="البريد الإلكتروني">
+          <input id="contactEmail" type="email" name="email" autocomplete="email" class="form-control" maxlength="180" placeholder="البريد الإلكتروني">
           <span class="fi">✉️</span>
         </div>
         <div class="field">
           <label class="req" for="contactType">نوع الموقع المطلوب *</label>
-          <select id="contactType" name="type" required>
+          <select id="contactType" name="type" class="form-select" required>
             <option value="" disabled selected>اختر نوع الموقع</option>
             <option>موقع شركة / مكتب</option>
             <option>موقع مطعم أو مقهى</option>
@@ -248,7 +251,7 @@
         </div>
         <div class="field">
           <label for="contactMessage">نبذة عن احتياجك (اختياري)</label>
-          <textarea id="contactMessage" name="msg" maxlength="3000" placeholder="نبذة عن احتياجك (اختياري)"></textarea>
+          <textarea id="contactMessage" name="msg" class="form-control" maxlength="3000" placeholder="نبذة عن احتياجك (اختياري)"></textarea>
           <span class="fi">💬</span>
         </div>
         <button type="submit" class="btn btn-purple"><svg class="ic-svg"><use href="#i-send"/></svg> إرسال الطلب</button>
@@ -280,22 +283,24 @@
   <div class="container cta-faq">
     <div class="faq-box">
       <h3>الأسئلة الشائعة</h3>
-      <details class="faq-item">
-        <summary><span class="plus">+</span> كم تكلفة إنشاء الموقع؟</summary>
-        <div class="ans">تختلف التكلفة حسب نوع الموقع ونطاقه. أرسل تفاصيل احتياجك لنراجع المتطلبات ونعدّ عرض سعر مناسباً.</div>
-      </details>
-      <details class="faq-item">
-        <summary><span class="plus">+</span> كم تستغرق مدة تنفيذ الموقع؟</summary>
-        <div class="ans">تتحدد المدة بعد معرفة الصفحات والمحتوى والمزايا المطلوبة، وتُذكر بوضوح في عرض السعر قبل بدء العمل.</div>
-      </details>
-      <details class="faq-item">
-        <summary><span class="plus">+</span> هل أستطيع تعديل محتوى الموقع بنفسي؟</summary>
-        <div class="ans">تتيح لوحة الإدارة الحالية إدارة الخدمات ونماذج الأعمال وإعدادات التواصل ومراجعة طلبات العملاء. إدارة صفحات أو منتجات إضافية تتطلب تحديدها ضمن نطاق المشروع.</div>
-      </details>
-      <details class="faq-item">
-        <summary><span class="plus">+</span> هل تقدمون دعماً تقنياً بعد التسليم؟</summary>
-        <div class="ans">يُحدد نطاق الدعم والصيانة ومدتهما ضمن عرض السعر والاتفاق الخاص بمشروعك.</div>
-      </details>
+      <div class="accordion custom-accordion" id="faqAccordion">
+        <div class="accordion-item">
+          <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" aria-expanded="false" aria-controls="faq1">كم تكلفة إنشاء الموقع؟</button></h3>
+          <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">تختلف التكلفة حسب نوع الموقع ونطاقه. أرسل تفاصيل احتياجك لنراجع المتطلبات ونعدّ عرض سعر مناسباً.</div></div>
+        </div>
+        <div class="accordion-item">
+          <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" aria-expanded="false" aria-controls="faq2">كم تستغرق مدة تنفيذ الموقع؟</button></h3>
+          <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">تتحدد المدة بعد معرفة الصفحات والمحتوى والمزايا المطلوبة، وتُذكر بوضوح في عرض السعر قبل بدء العمل.</div></div>
+        </div>
+        <div class="accordion-item">
+          <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" aria-expanded="false" aria-controls="faq3">هل أستطيع تعديل محتوى الموقع بنفسي؟</button></h3>
+          <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">تتيح لوحة الإدارة الحالية إدارة الخدمات ونماذج الأعمال وإعدادات التواصل ومراجعة طلبات العملاء. إدارة صفحات أو منتجات إضافية تتطلب تحديدها ضمن نطاق المشروع.</div></div>
+        </div>
+        <div class="accordion-item">
+          <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4" aria-expanded="false" aria-controls="faq4">هل تقدمون دعماً تقنياً بعد التسليم؟</button></h3>
+          <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion"><div class="accordion-body">يُحدد نطاق الدعم والصيانة ومدتهما ضمن عرض السعر والاتفاق الخاص بمشروعك.</div></div>
+        </div>
+      </div>
     </div>
     <div class="cta-banner">
       <h3>هل لديك مشروع رقمي؟</h3>
@@ -354,7 +359,8 @@
 
 <a class="wa-float js-whatsapp-float" id="waFloat" href="#" target="_blank" rel="noopener" aria-label="تواصل معنا عبر واتساب" hidden><svg class="ic-svg" aria-hidden="true"><use href="#i-whatsapp"/></svg></a>
 
-<script src="/js/app.js?v=5" defer></script>
+<script src="/vendor/bootstrap.bundle.min.js" defer></script>
+<script src="/js/app.js?v=6" defer></script>
 <script>
 function scrollTpl(dir){
   const row=document.getElementById('tplRow');

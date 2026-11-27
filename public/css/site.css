@@ -19,15 +19,29 @@
   .skip-link:focus{transform:none}
   .container{max-width:1150px;margin:0 auto;padding:0 20px}
 
-  /* ---------- Header ---------- */
-  header{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid #f0eefc}
-  .nav{display:flex;align-items:center;justify-content:space-between;height:74px}
-  .menu-toggle{display:none;align-items:center;justify-content:center;width:42px;height:42px;flex:none;border:1px solid #eee9fb;border-radius:12px;background:#fff;color:var(--purple);cursor:pointer}
-  .menu-toggle .ic-svg{width:22px;height:22px}
+  /* ---------- Header (Bootstrap navbar) ---------- */
+  .navbar-custom{background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid #f0eefc;padding-block:9px}
+  .navbar-custom .navbar-brand{display:flex;align-items:center;gap:10px;margin:0}
+  .navbar-custom .navbar-brand .logo-mark{width:42px;height:42px}
+  .navbar-custom .navbar-nav{gap:22px}
+  .navbar-custom .nav-link{font-size:14.5px;font-weight:700;color:#4b4670;padding:8px 2px;position:relative;transition:.2s}
+  .navbar-custom .nav-link:hover,.navbar-custom .nav-link.active{color:var(--purple)}
+  .navbar-custom .nav-link.active::after{content:'';position:absolute;bottom:0;right:0;left:0;height:3px;border-radius:3px;background:var(--purple)}
+  .navbar-custom .navbar-toggler{border:1px solid #eee9fb;border-radius:12px;color:var(--purple);padding:8px 10px;box-shadow:none}
+  .navbar-custom .navbar-toggler:focus{box-shadow:0 0 0 3px rgba(124,58,237,.18)}
+  .navbar-custom .navbar-toggler .ic-svg{width:22px;height:22px}
+  @media(max-width:991px){
+    .navbar-custom .nav-link{padding:10px 4px;font-size:15px}
+    .navbar-custom .nav-link.active::after{display:none}
+    .navbar-custom .navbar-collapse{margin-top:8px;padding:8px 20px 16px;border-radius:14px}
+    .navbar-custom .navbar-nav{gap:0}
+    .navbar-custom .nav-item+.nav-item{border-top:1px solid #f1eef9}
+    .navbar-custom .quote-link{margin-top:10px;width:100%;justify-content:center}
+  }
   .logo{display:flex;align-items:center;gap:10px}
+  .ic-svg{width:1em;height:1em;fill:currentColor;flex:none;display:inline-block;vertical-align:-.12em}
   .logo-mark{width:42px;height:42px;border-radius:12px;flex:none;display:block;overflow:hidden;box-shadow:0 6px 16px -6px rgba(47,107,255,.38)}
   .logo-mark img{width:100%;height:100%;object-fit:cover}
-  .ic-svg{width:1em;height:1em;fill:currentColor;flex:none;display:inline-block;vertical-align:-.12em}
   .btn .ic-svg{width:17px;height:17px}
   .car-btn .ic-svg{width:18px;height:18px}
   .socials .ic-svg{width:17px;height:17px}
@@ -39,13 +53,7 @@
   .logo-text{line-height:1.1}
   .logo-text b{display:block;font-size:22px;font-weight:900;color:var(--purple)}
   .logo-text span{font-size:11px;color:var(--muted);font-weight:500}
-  header nav{margin-inline:auto}
-  nav ul{display:flex;list-style:none;gap:26px}
-  header nav a{font-size:14.5px;font-weight:700;color:#4b4670;transition:.2s}
-  nav a:hover{color:var(--purple)}
-  nav a.active{color:var(--purple);position:relative}
-  nav a.active::after{content:'';position:absolute;bottom:-6px;right:0;left:0;height:3px;border-radius:3px;background:var(--purple)}
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:50px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:14.5px;font-weight:700;transition:.25s}
+  .btn{display:inline-flex;align-items:center;gap:8px;border-radius:50px;padding:11px 22px;font-family:'Tajawal',sans-serif;font-size:14.5px;font-weight:700;transition:.25s}
   .quote-link-text{display:inline}
   .btn-purple{background:linear-gradient(135deg,#7c3aed,#8b5cf6);color:#fff;box-shadow:0 8px 20px -6px rgba(124,58,237,.5)}
   .btn-purple:hover{transform:translateY(-2px);box-shadow:0 12px 26px -6px rgba(124,58,237,.6)}
@@ -86,12 +94,12 @@
   .screen-btns .s1{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
   .screen-btns .s2{background:rgba(255,255,255,.1)}
   .screen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  .card{background:rgba(255,255,255,.07);border-radius:8px;overflow:hidden}
-  .card img{width:100%;height:58px;object-fit:cover}
-  .card div{padding:6px;text-align:center}
-  .card b{display:block;color:#fff;font-size:10px;font-weight:700}
-  .card span{color:#b3a8dd;font-size:8.5px}
-  .card small{display:block;margin-top:4px;border-radius:5px;background:rgba(139,92,246,.35);color:#fff;font-size:7.5px;padding:2px 0;font-family:inherit}
+  .mini-card{background:rgba(255,255,255,.07);border-radius:8px;overflow:hidden}
+  .mini-card img{width:100%;height:58px;object-fit:cover}
+  .mini-card div{padding:6px;text-align:center}
+  .mini-card b{display:block;color:#fff;font-size:10px;font-weight:700}
+  .mini-card span{color:#b3a8dd;font-size:8.5px}
+  .mini-card small{display:block;margin-top:4px;border-radius:5px;background:rgba(139,92,246,.35);color:#fff;font-size:7.5px;padding:2px 0;font-family:inherit}
   .phone{position:absolute;bottom:0;right:5%;width:150px;z-index:2;background:#0e0920;border-radius:24px;padding:10px 8px 12px;box-shadow:0 30px 60px -15px rgba(0,0,0,.7);transform:rotate(3deg)}
   .phone-notch{width:60px;height:5px;background:#2c2248;border-radius:3px;margin:0 auto 10px}
   .phone-screen{background:linear-gradient(160deg,#2c1c50,#160d2c);border-radius:14px;padding:12px 10px;text-align:center;direction:rtl}
@@ -206,12 +214,11 @@
   .cta-banner{position:relative;border-radius:20px;overflow:hidden;color:#fff;display:flex;flex-direction:column;justify-content:center;padding:40px 36px;background:linear-gradient(100deg,rgba(23,10,50,.93) 25%,rgba(40,18,80,.75) 70%,rgba(60,30,110,.6) 100%),linear-gradient(135deg,#3b1f78,#6d28d9)}
   .cta-banner h3{font-size:30px;font-weight:900;margin-bottom:8px}
   .cta-banner p{color:#d9d2f5;font-size:15px;margin-bottom:22px;max-width:340px}
-  .faq-item{background:#f6f4fd;border-radius:12px;margin-bottom:12px;overflow:hidden}
-  .faq-item summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 18px;font-weight:700;font-size:14.5px;color:#3b3663}
-  .faq-item summary::-webkit-details-marker{display:none}
-  .faq-item summary .plus{flex:none;width:26px;height:26px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:var(--purple);font-weight:900;box-shadow:0 3px 8px rgba(44,37,84,.1);transition:.25s}
-  .faq-item[open] summary .plus{transform:rotate(45deg);background:var(--purple);color:#fff}
-  .faq-item .ans{padding:0 18px 16px 18px;font-size:13.5px;color:#6f6a8e}
+  .custom-accordion .accordion-item{border:1px solid #eee9fb;border-radius:12px!important;overflow:hidden;background:#f6f4fd;margin-bottom:12px}
+  .custom-accordion .accordion-button{background:transparent;color:#3b3663;font-weight:700;font-size:14.5px;box-shadow:none;padding:14px 18px}
+  .custom-accordion .accordion-button:not(.collapsed){background:var(--purple-light);color:var(--purple);box-shadow:none}
+  .custom-accordion .accordion-button:focus{box-shadow:0 0 0 3px rgba(124,58,237,.15)}
+  .custom-accordion .accordion-body{padding:0 18px 16px;font-size:13.5px;color:#6f6a8e}
   .faq-box h3{font-size:22px;font-weight:900;color:#2c2554;margin-bottom:16px}
 
   /* ---------- Footer ---------- */
@@ -247,13 +254,6 @@
   /* ---------- Responsive ---------- */
   @media(max-width:992px){
     .hero-inner{grid-template-columns:1fr;text-align:center}
-    .menu-toggle{display:inline-flex}
-    header nav{display:none;position:absolute;top:74px;right:0;left:0;z-index:110;margin:0;background:#fff;border-bottom:1px solid #eee9fb;box-shadow:0 14px 24px -18px rgba(23,16,46,.4)}
-    header nav.open{display:block}
-    header nav ul{display:flex;flex-direction:column;gap:0;padding:8px 20px 16px}
-    header nav li+li{border-top:1px solid #f1eef9}
-    header nav a{display:block;padding:10px 4px;font-size:15px}
-    header nav a.active::after{display:none}
     .hero p.lead{margin-inline:auto}
     .hero-feats li{justify-content:center}
     .hero-cta{justify-content:center}
@@ -265,18 +265,11 @@
     .foot-main{grid-template-columns:1fr 1fr}
   }
   @media(max-width:600px){
-    .nav{gap:10px}
-    .nav .menu-toggle{order:0}
-    .nav .logo{order:1;margin-inline-end:auto;gap:7px}
-    .nav nav{order:3}
-    .nav .quote-link{order:4}
-    .nav .logo-mark{width:38px;height:38px}
-    .nav .logo-text b{font-size:19px}
-    .nav .logo-text span{font-size:9px}
-    .nav .btn{padding:10px 12px;font-size:12px;white-space:nowrap}
-    .nav .quote-link{padding:10px 12px}
-    .nav .quote-link .ic-svg{width:17px;height:17px}
-    .nav .quote-link-text{display:inline}
+    .navbar-brand{gap:7px}
+    .navbar-brand .logo-mark{width:38px;height:38px}
+    .navbar-brand .logo-text b{font-size:19px}
+    .navbar-brand .logo-text span{font-size:9px}
+    .navbar .quote-link{padding:10px 12px;font-size:12px;white-space:nowrap}
     .hero{background:radial-gradient(600px 300px at 80% -5%,rgba(139,92,246,.4),transparent 60%),linear-gradient(160deg,#160d2c 0%,#241342 58%,#34205c 100%)}
     .hero-arrow{display:none}
     .hero-inner{padding:38px 20px 110px}
@@ -285,11 +278,11 @@
     .laptop{top:12px;left:1%;width:94%;padding:8px 8px 14px;transform:rotate(-1deg)}
     .screen{padding:10px}
     .screen-grid{gap:5px}
-    .card img{height:48px}
-    .card div{padding:4px}
-    .card b{font-size:9px}
-    .card span{font-size:7.5px}
-    .card button{font-size:7.5px}
+    .mini-card img{height:48px}
+    .mini-card div{padding:4px}
+    .mini-card b{font-size:9px}
+    .mini-card span{font-size:7.5px}
+    .mini-card button{font-size:7.5px}
     .phone{right:3%;bottom:0;width:116px;padding:8px 7px 9px;transform:rotate(1deg)}
     .phone-screen{padding:9px 8px}
     .phone-screen img{height:68px}
@@ -304,11 +297,10 @@
     .contact-line .contact-text{min-width:0;line-height:1.5}
   }
   @media(max-width:360px){
-    .nav{gap:7px}
-    .nav .logo{gap:5px}
-    .nav .logo-mark{width:34px;height:34px}
-    .nav .logo-text b{font-size:17px}
-    .nav .logo-text span{font-size:8px}
-    .nav .menu-toggle{width:38px;height:38px}
-    .nav .quote-link{padding:9px 10px;font-size:12px}
+    .navbar-brand{gap:5px}
+    .navbar-brand .logo-mark{width:34px;height:34px}
+    .navbar-brand .logo-text b{font-size:17px}
+    .navbar-brand .logo-text span{font-size:8px}
+    .navbar-custom .navbar-toggler{padding:6px 8px}
+    .navbar-custom .navbar-toggler .ic-svg{width:19px;height:19px}
   }
