@@ -9,7 +9,7 @@ const AdminAPI = {
 const $=id=>document.getElementById(id);
 const escAdmin=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dateText=v=>{const d=new Date(String(v||'').replace(' ','T')+'Z');return Number.isNaN(+d)?'—':d.toLocaleString('ar-MA',{dateStyle:'short',timeStyle:'short'});};
-const state={messages:[],services:[],projects:[],settings:{},username:'',modalId:null,setup:false,projectFile:null,previewUrl:null};
+const state={messages:[],services:[],projects:[],settings:{},username:'',avatar:'',modalId:null,setup:false,projectFile:null,previewUrl:null};
 function notice(message){const n=$('notice');n.textContent=message;n.classList.add('show');clearTimeout(notice.timer);notice.timer=setTimeout(()=>n.classList.remove('show'),3200);}
 function showError(target,message){target.textContent=message;}
 
@@ -19,7 +19,7 @@ async function boot(){
     state.setup=status.needsSetup;
     configureAuth();
     const me=await AdminAPI.request('/api/auth/me');
-    if(me.authenticated){state.username=me.username;await showAdmin();}
+    if(me.authenticated){state.username=me.username;state.avatar=me.avatar||'';await showAdmin();}
   }catch(error){$('loginTitle').textContent='تعذر الاتصال بالخادم';$('loginDesc').textContent='تأكد من تشغيل الخادم ثم أعد تحميل الصفحة.';showError($('authError'),error.message);}
 }
 function configureAuth(){
@@ -40,15 +40,32 @@ $('authForm').addEventListener('submit',async e=>{
   try{
     const headers=state.setup&&$('setupSecret').value?{'x-hadir-setup-key':$('setupSecret').value}:{};
     const data=await AdminAPI.request(state.setup?'/api/setup':'/api/auth/login',{method:'POST',headers,body:JSON.stringify({username,password})});
-    state.username=data.username;state.setup=false;await showAdmin();
+    state.username=data.username;state.avatar=data.avatar||'';state.setup=false;await showAdmin();
   }catch(error){showError($('authError'),error.message);}
   finally{$('authButton').disabled=false;}
 });
 async function showAdmin(){
-  $('loginScreen').style.display='none';$('app').style.display='block';$('adminName').textContent=`مرحباً، ${state.username}`;const av=$('userAvatar');if(av)av.textContent=(state.username[0]||'ح').toUpperCase();
+  $('loginScreen').style.display='none';$('app').style.display='block';$('adminName').textContent=`مرحباً، ${state.username}`;renderAvatar();
   try{await loadAll();await loadBackups();}catch(error){notice(error.message);}
 }
 $('logoutMenuBtn').addEventListener('click',async()=>{try{await AdminAPI.request('/api/auth/logout',{method:'POST'});}catch{}location.reload();});
+
+function renderAvatar(){const initial=(state.username[0]||'ح').toUpperCase();for(const el of [$('userAvatar'),$('avatarPreview')]){if(!el)continue;if(state.avatar){el.style.backgroundImage=`url(${state.avatar})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center';el.textContent='';}else{el.style.backgroundImage='';el.textContent=initial;}}}
+
+// تغيير الصورة الشخصية
+async function pickAvatar(file){
+ if(!file)return;
+ if(!['image/png','image/jpeg','image/webp'].includes(file.type)||file.size>4*1024*1024)return notice('اختر صورة PNG أو JPG أو WebP بحجم لا يتجاوز 4 MB');
+ try{
+  const data=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('تعذرت قراءة الملف'));reader.readAsDataURL(file);});
+  const res=await AdminAPI.request('/api/admin/uploads',{method:'POST',body:JSON.stringify({data})});
+  await AdminAPI.request('/api/admin/avatar',{method:'POST',body:JSON.stringify({avatar:res.url})});
+  state.avatar=res.url;renderAvatar();notice('تم تحديث الصورة الشخصية ✅');
+ }catch(err){notice(err.message);}
+}
+$('avatarPick').addEventListener('click',()=>$('avatarFile').click());
+$('avatarFile').addEventListener('change',e=>{pickAvatar(e.target.files[0]).finally(()=>{$('avatarFile').value='';});});
+$('avatarClear').addEventListener('click',async()=>{try{await AdminAPI.request('/api/admin/avatar',{method:'POST',body:JSON.stringify({avatar:''})});state.avatar='';renderAvatar();notice('أُعيدت الصورة الافتراضية');}catch(err){notice(err.message);}});
 
 // قائمة الحساب المنسدلة (الشريحة أعلى اليسار)
 function setUserMenu(open){$('userDropdown').classList.toggle('hidden',!open);$('userChip').setAttribute('aria-expanded',String(open));}
@@ -57,7 +74,7 @@ document.addEventListener('click',e=>{if(!e.target.closest||!e.target.closest('.
 document.addEventListener('keydown',e=>{if(e.key==='Escape')setUserMenu(false);});
 
 // نافذة إعدادات الحساب (اسم المستخدم + كلمة المرور)
-function openProfile(){setUserMenu(false);$('profileUsername').value=state.username;$('profileCurrentPassword').value='';$('profileNewPassword').value='';$('profileConfirmPassword').value='';$('profileModal').classList.add('open');setTimeout(()=>$('profileCurrentPassword').focus(),50);}
+function openProfile(){setUserMenu(false);renderAvatar();$('profileUsername').value=state.username;$('profileCurrentPassword').value='';$('profileNewPassword').value='';$('profileConfirmPassword').value='';$('profileModal').classList.add('open');setTimeout(()=>$('profileCurrentPassword').focus(),50);}
 function closeProfile(){$('profileModal').classList.remove('open');}
 $('profileMenuBtn').addEventListener('click',openProfile);
 $('profileModalClose').addEventListener('click',closeProfile);

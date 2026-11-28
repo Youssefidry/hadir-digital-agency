@@ -28,6 +28,8 @@ db.exec(`
  CREATE TABLE IF NOT EXISTS messages(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT NOT NULL,phone TEXT NOT NULL,email TEXT NOT NULL DEFAULT '',type TEXT NOT NULL,message TEXT NOT NULL DEFAULT '',is_read INTEGER NOT NULL DEFAULT 0,workflow_status TEXT NOT NULL DEFAULT 'new',created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
  CREATE INDEX IF NOT EXISTS idx_messages_created ON messages(created_at DESC);
 `);
+const adminColumns=new Set(db.prepare('PRAGMA table_info(admins)').all().map(x=>x.name));
+if(!adminColumns.has('avatar'))db.exec("ALTER TABLE admins ADD COLUMN avatar TEXT NOT NULL DEFAULT ''");
 const messageColumns=new Set(db.prepare('PRAGMA table_info(messages)').all().map(x=>x.name));
 if(!messageColumns.has('workflow_status'))db.exec("ALTER TABLE messages ADD COLUMN workflow_status TEXT NOT NULL DEFAULT 'new'");
 if(!messageColumns.has('budget'))db.exec("ALTER TABLE messages ADD COLUMN budget TEXT NOT NULL DEFAULT ''");
@@ -157,17 +159,17 @@ const server=createServer(async(req,res)=>{
     db.prepare('INSERT INTO admins(username,password_hash,password_salt) VALUES(?,?,?)').run(username,hash,salt);
     db.exec('COMMIT');
    }catch(e){try{db.exec('ROLLBACK');}catch{}return fail(res,409,'تعذر إنشاء حساب المدير؛ ربما تم إعداده مسبقاً');}
-   const token=randomBytes(32).toString('base64url');sessions.set(token,{username,expires:Date.now()+SESSION_TTL});return send(res,201,{ok:true,username},{'Set-Cookie':setCookie(token)});
+   const token=randomBytes(32).toString('base64url');sessions.set(token,{username,expires:Date.now()+SESSION_TTL});return send(res,201,{ok:true,username,avatar:''},{'Set-Cookie':setCookie(token)});
   }
   if(req.method==='POST'&&path==='/api/auth/login'){
    if(rateLimited(req,'login',10,900000))return fail(res,429,'محاولات كثيرة، حاول بعد 15 دقيقة');
    const d=await readBody(req),username=str(d.username,40,true),password=str(d.password,200,true),row=username&&db.prepare('SELECT * FROM admins WHERE username=?').get(username);
    if(!row||!password){await new Promise(r=>setTimeout(r,150));return fail(res,401,'بيانات الدخول غير صحيحة');}
    const hash=scryptSync(password,row.password_salt,64);if(!timingSafeEqual(hash,Buffer.from(row.password_hash,'hex'))){await new Promise(r=>setTimeout(r,150));return fail(res,401,'بيانات الدخول غير صحيحة');}
-   const token=randomBytes(32).toString('base64url');sessions.set(token,{username:row.username,expires:Date.now()+SESSION_TTL});return send(res,200,{ok:true,username:row.username},{'Set-Cookie':setCookie(token)});
+   const token=randomBytes(32).toString('base64url');sessions.set(token,{username:row.username,expires:Date.now()+SESSION_TTL});return send(res,200,{ok:true,username:row.username,avatar:row.avatar||''},{'Set-Cookie':setCookie(token)});
   }
   if(req.method==='POST'&&path==='/api/auth/logout'){const m=(req.headers.cookie||'').match(/(?:^|;\s*)hadir_session=([A-Za-z0-9_-]+)/);if(m)sessions.delete(m[1]);return send(res,200,{ok:true},{'Set-Cookie':clearCookie});}
-  if(req.method==='GET'&&path==='/api/auth/me'){const s=session(req);return send(res,200,{authenticated:Boolean(s),username:s?.username||null});}
+  if(req.method==='GET'&&path==='/api/auth/me'){const s=session(req);const admin=s&&db.prepare('SELECT avatar FROM admins WHERE username=?').get(s.username);return send(res,200,{authenticated:Boolean(s),username:s?.username||null,avatar:admin?.avatar||''});}
   if(req.method==='GET'&&path==='/api/public')return send(res,200,{settings:settingsObject(),services:db.prepare('SELECT * FROM services ORDER BY sort_order,id').all().map(serviceObject),projects:db.prepare('SELECT * FROM projects ORDER BY sort_order,id').all().map(projectObject)});
   if(req.method==='POST'&&path==='/api/messages'){
    if(rateLimited(req,'message',5,3600000))return fail(res,429,'تم تجاوز عدد الطلبات، حاول لاحقاً');
@@ -246,6 +248,15 @@ const server=createServer(async(req,res)=>{
     const salt=randomBytes(16).toString('hex'),hash=scryptSync(next,salt,64).toString('hex');db.prepare('UPDATE admins SET password_hash=?,password_salt=? WHERE id=?').run(hash,salt,row.id);
     for(const[token,sessionData]of sessions)if(sessionData.username===row.username)sessions.delete(token);
     const token=randomBytes(32).toString('base64url');sessions.set(token,{username:row.username,expires:Date.now()+SESSION_TTL});return send(res,200,{ok:true},{'Set-Cookie':setCookie(token)});
+   }
+   if(req.method==='POST'&&path==='/api/admin/avatar'){
+    const d=await readBody(req),avatar=str(d.avatar,1000)||'';
+    if(avatar){
+     if(!/^\/uploads\/[a-f0-9]{36}\.(?:png|jpg|webp|gif)$/.test(avatar))return fail(res,400,'الصورة الشخصية يجب أن تكون صورة مرفوعة من اللوحة');
+     if(!existsSync(resolve(PUBLIC_DIR,'.'+avatar)))return fail(res,400,'ملف الصورة المرفوعة غير موجود');
+    }
+    db.prepare('UPDATE admins SET avatar=? WHERE username=?').run(avatar,session(req).username);
+    return send(res,200,{ok:true,avatar});
    }
    if(req.method==='POST'&&path==='/api/admin/profile'){
     const d=await readBody(req),current=typeof d.currentPassword==='string'?d.currentPassword:'';
