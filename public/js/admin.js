@@ -15,6 +15,8 @@ function showError(target,message){target.textContent=message;}
 
 async function boot(){
   try{
+    // تطبيق الهوية (الشعار والأيقونة والاسم) من الإعدادات العامة قبل تسجيل الدخول
+    try{const pub=await AdminAPI.request('/api/public');if(pub&&pub.settings){state.settings={...state.settings,...pub.settings};applyBrand();}}catch{}
     const status=await AdminAPI.request('/api/setup/status');
     state.setup=status.needsSetup;
     configureAuth();
@@ -165,7 +167,7 @@ async function loadSettings(){const data=await AdminAPI.request('/api/admin/sett
 }
 function applyBrand(){const DEFAULT_ICON='/assets/hadir-icon.svg';const logo=state.settings.logo||DEFAULT_ICON,icon=state.settings.favicon||DEFAULT_ICON;
   document.querySelectorAll('.brand-mark img,.logo-mark img').forEach(img=>{img.src=logo;});
-  document.querySelectorAll('.brand-name').forEach(el=>{if(el.closest('.side-brand'))el.textContent=state.settings.siteName||'Hadir';});
+  document.querySelectorAll('.brand-name').forEach(el=>{el.textContent=state.settings.siteName||'Hadir';});
   const link=document.querySelector('link[rel="icon"]');if(link)link.href=icon;
 }
 function sectionOn(key){return state.settings[key]!=='0';}
