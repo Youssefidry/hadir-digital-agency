@@ -8,6 +8,16 @@ const HadirAPI = {
   }
 };
 function esc(value) { return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+
+// رادع نسخ المحتوى: منع قائمة النقر الأيمن على الصور وسحبها، ومنع Ctrl+S / Ctrl+U (رادع فقط، وليس حماية مطلقة)
+try {
+  document.addEventListener('contextmenu', e => { if (e.target && e.target.closest && e.target.closest('img')) e.preventDefault(); });
+  document.addEventListener('dragstart', e => { if (e.target && e.target.closest && e.target.closest('img')) e.preventDefault(); });
+  document.addEventListener('keydown', e => {
+    const k = (e.key || '').toUpperCase();
+    if (e.ctrlKey && !e.shiftKey && !e.altKey && (k === 'S' || k === 'U')) e.preventDefault();
+  });
+} catch {}
 async function initSite() {
   const toast=document.getElementById('formToast');
   const year=document.querySelector('.current-year');

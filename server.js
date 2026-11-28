@@ -93,10 +93,51 @@ const serviceObject=r=>({id:r.id,icon:r.icon,title:r.title,desc:r.description,so
 const projectObject=r=>({id:r.id,title:r.title,cat:r.category,img:r.image_url,tags:r.tags,btn:r.button_color,sortOrder:r.sort_order});
 const messageObject=r=>({id:r.id,name:r.name,phone:r.phone,email:r.email,type:r.type,msg:r.message,budget:r.budget||'',timeline:r.timeline||'',read:Boolean(r.is_read),status:r.workflow_status|| (r.is_read?'done':'new'),date:r.created_at});
 
+// ---- VPN / proxy blocking (optional, enabled with HADIR_VPN_BLOCK=1) ----
+const VPN_BLOCK=process.env.HADIR_VPN_BLOCK==='1';
+const VPN_BLOCK_HOSTING=process.env.HADIR_VPN_BLOCK_HOSTING!=='0';
+const VPN_ALLOWED_COUNTRIES=(process.env.HADIR_ALLOWED_COUNTRIES||'').split(',').map(x=>x.trim().toUpperCase()).filter(Boolean);
+const vpnCache=new Map();
+const normalizeIp=ip=>String(ip).replace(/^::ffff:/,'');
+const isLocalIp=ip=>ip==='localhost'||ip==='::1'||ip.startsWith('127.')||ip.startsWith('::ffff:127.')||/^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(ip)||ip.startsWith('fc')||ip.startsWith('fd');
+function clientIp(req){
+ if(process.env.HADIR_TRUST_PROXY==='1'){const xf=req.headers['x-forwarded-for'];if(xf)return String(xf).split(',')[0].trim();}
+ return req.socket.remoteAddress||'';
+}
+async function vpnVerdict(ip){
+ const now=Date.now(),hit=vpnCache.get(ip);
+ if(hit&&hit.exp>now)return hit.result;
+ let result={ok:true}; // fail-open if the lookup service is unreachable
+ try{
+  const r=await fetch(`http://ip-api.com/json/${encodeURIComponent(ip)}?fields=status,countryCode,proxy,hosting`,{signal:AbortSignal.timeout(3000)});
+  const d=await r.json();
+  if(d.status==='success'){
+   const bad=d.proxy===true||(VPN_BLOCK_HOSTING&&d.hosting===true)||(VPN_ALLOWED_COUNTRIES.length>0&&!VPN_ALLOWED_COUNTRIES.includes(String(d.countryCode||'').toUpperCase()));
+   if(bad)result={ok:false};
+  }
+ }catch{}
+ vpnCache.set(ip,{result,exp:now+12*60*60*1000});
+ if(vpnCache.size>5000)vpnCache.delete(vpnCache.keys().next().value);
+ return result;
+}
+
 const server=createServer(async(req,res)=>{
  res.setHeader('X-Content-Type-Options','nosniff'); res.setHeader('Referrer-Policy','strict-origin-when-cross-origin'); res.setHeader('X-Frame-Options','DENY');
  res.setHeader('Permissions-Policy','camera=(), microphone=(), geolocation=()');
  if(process.env.NODE_ENV==='production')res.setHeader('Strict-Transport-Security','max-age=31536000; includeSubDomains');
+ if(VPN_BLOCK){
+  const ip=normalizeIp(clientIp(req));
+  if(ip&&!isLocalIp(ip)){
+   const verdict=await vpnVerdict(ip);
+   if(!verdict.ok){
+    if((req.headers.accept||'').includes('text/html')){
+     const blockedPage=resolve(PUBLIC_DIR,'blocked.html');
+     if(existsSync(blockedPage)){res.writeHead(403,{'Content-Type':mime['.html'],'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});return createReadStream(blockedPage).pipe(res);}
+    }
+    return fail(res,403,'الوصول مرفوض: يبدو أنك تستخدم VPN أو وكيلاً. أوقفه ثم أعد المحاولة.');
+   }
+  }
+ }
  let path;
  try {
   path=decodeURIComponent(new URL(req.url,`http://${req.headers.host||'localhost'}`).pathname);

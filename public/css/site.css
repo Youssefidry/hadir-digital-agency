@@ -12,7 +12,7 @@
   html{scroll-behavior:smooth;scroll-padding-top:90px}
   @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;transition-delay:0ms!important}}
   body{font-family:'Tajawal',sans-serif;color:var(--text);background:#fff;line-height:1.7;overflow-x:hidden}
-  img{display:block;max-width:100%}
+  img{display:block;max-width:100%;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;user-drag:none}
   a{text-decoration:none;color:inherit}
   a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #a78bfa;outline-offset:3px}
   .skip-link{position:fixed;top:8px;right:8px;z-index:200;transform:translateY(-160%);padding:10px 16px;border-radius:10px;background:#fff;color:var(--purple);font-weight:800;box-shadow:0 6px 20px rgba(23,16,46,.2)}
