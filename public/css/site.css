@@ -141,7 +141,7 @@
 
   /* ---------- Portfolio ---------- */
   .tpl-wrap{position:relative}
-  .tpl-row{display:flex;gap:20px;overflow-x:auto;scroll-behavior:smooth;padding:6px 4px 18px;scrollbar-width:none}
+  .tpl-row{display:flex;gap:20px;overflow-x:auto;padding:6px 4px 18px;scrollbar-width:none;overscroll-behavior-x:contain}
   .tpl-row::-webkit-scrollbar{display:none}
   .tpl{flex:none;width:calc((100% - 60px)/4);min-width:210px;border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 10px 30px -12px rgba(44,37,84,.18);display:flex;flex-direction:column}
   .tpl-img{position:relative;height:190px}
@@ -167,14 +167,15 @@
   .car-btn:hover{background:var(--purple);color:#fff}
 
   /* ---------- Why us + form ---------- */
-  .panel-grid{display:grid;grid-template-columns:1fr 1fr;gap:34px;align-items:stretch}
+  .panel-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:34px;align-items:stretch}
+  .panel-grid>.panel{min-width:0}
   .panel{border-radius:20px;padding:36px}
   .panel-lav{background:linear-gradient(150deg,#f3efff,#e9e2fc)}
   .panel-white{background:#fff;border:1px solid #eee9fb;box-shadow:0 16px 44px -20px rgba(44,37,84,.14)}
   .panel-lav h3{font-size:23px;font-weight:900;color:#2c2554;margin-bottom:8px}
   .panel-lav .sub{font-size:15px;color:#5d5680;margin-bottom:22px}
   .stats{display:flex;gap:12px;margin-bottom:24px}
-  .stat-box{flex:1;background:#fff;border-radius:14px;padding:16px 12px;text-align:center;box-shadow:0 8px 22px -12px rgba(109,40,217,.25)}
+  .stat-box{flex:1;min-width:0;background:#fff;border-radius:14px;padding:16px 12px;text-align:center;box-shadow:0 8px 22px -12px rgba(109,40,217,.25)}
   .stat-box b{display:block;font-size:22px;font-weight:900;color:var(--purple)}
   .stat-box small{font-size:12px;color:#6f6a8e;font-weight:500}
   .why-feats{list-style:none;margin-bottom:28px}
@@ -291,6 +292,10 @@
     .phone-screen{padding:9px 8px}
     .phone-screen img{height:68px}
     .svc-grid{grid-template-columns:1fr}
+    .panel{padding:26px 18px}
+    .stat-box{padding:12px 8px}
+    .stat-box b{font-size:18px}
+    .stat-box small{font-size:11px}
     .tpl{width:85%}
     form .row{grid-template-columns:1fr}
     .foot-main{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 18px;padding:36px 20px 28px}
