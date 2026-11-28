@@ -59,6 +59,9 @@
   .btn-purple:hover{transform:translateY(-2px);box-shadow:0 12px 26px -6px rgba(124,58,237,.6)}
   .btn-green{background:var(--green);color:#fff;box-shadow:0 8px 20px -6px rgba(22,163,74,.5)}
   .btn-green:hover{transform:translateY(-2px)}
+  .btn-wa{background:#25d366;color:#fff;width:100%;justify-content:center;margin-top:10px;box-shadow:0 8px 20px -6px rgba(37,211,102,.5)}
+  .btn-wa:hover{transform:translateY(-2px)}
+  .btn-wa[hidden]{display:none}
   .btn-lg{padding:15px 32px;font-size:16px}
 
   /* ---------- Hero ---------- */
@@ -193,6 +196,7 @@
   .field:has(select) select{appearance:none;padding-left:36px}
   .field:has(select) .fi{left:14px;right:auto;top:37px}
   form .btn{width:100%;justify-content:center}
+  form .btn.btn-wa{display:inline-flex}
   #formToast.show{opacity:1;transform:none}
 
   /* ---------- Process timeline ---------- */

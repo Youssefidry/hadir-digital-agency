@@ -30,6 +30,8 @@ db.exec(`
 `);
 const messageColumns=new Set(db.prepare('PRAGMA table_info(messages)').all().map(x=>x.name));
 if(!messageColumns.has('workflow_status'))db.exec("ALTER TABLE messages ADD COLUMN workflow_status TEXT NOT NULL DEFAULT 'new'");
+if(!messageColumns.has('budget'))db.exec("ALTER TABLE messages ADD COLUMN budget TEXT NOT NULL DEFAULT ''");
+if(!messageColumns.has('timeline'))db.exec("ALTER TABLE messages ADD COLUMN timeline TEXT NOT NULL DEFAULT ''");
 const serviceColumns=new Set(db.prepare('PRAGMA table_info(services)').all().map(x=>x.name));
 if(!serviceColumns.has('sort_order'))db.exec('ALTER TABLE services ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0');
 const projectColumns=new Set(db.prepare('PRAGMA table_info(projects)').all().map(x=>x.name));
@@ -89,7 +91,7 @@ function sameOriginRequest(req){
 const settingsObject=()=>Object.fromEntries(db.prepare('SELECT key,value FROM settings').all().map(x=>[x.key,x.value]));
 const serviceObject=r=>({id:r.id,icon:r.icon,title:r.title,desc:r.description,sortOrder:r.sort_order});
 const projectObject=r=>({id:r.id,title:r.title,cat:r.category,img:r.image_url,tags:r.tags,btn:r.button_color,sortOrder:r.sort_order});
-const messageObject=r=>({id:r.id,name:r.name,phone:r.phone,email:r.email,type:r.type,msg:r.message,read:Boolean(r.is_read),status:r.workflow_status|| (r.is_read?'done':'new'),date:r.created_at});
+const messageObject=r=>({id:r.id,name:r.name,phone:r.phone,email:r.email,type:r.type,msg:r.message,budget:r.budget||'',timeline:r.timeline||'',read:Boolean(r.is_read),status:r.workflow_status|| (r.is_read?'done':'new'),date:r.created_at});
 
 const server=createServer(async(req,res)=>{
  res.setHeader('X-Content-Type-Options','nosniff'); res.setHeader('Referrer-Policy','strict-origin-when-cross-origin'); res.setHeader('X-Frame-Options','DENY');
@@ -130,9 +132,10 @@ const server=createServer(async(req,res)=>{
    if(rateLimited(req,'message',5,3600000))return fail(res,429,'تم تجاوز عدد الطلبات، حاول لاحقاً');
    const d=await readBody(req),name=str(d.name,100,true),phone=str(d.phone,40,true),email=str(d.email,180),type=str(d.type,100,true),message=str(d.msg,3000);
    if(!name||!phone||!type||email===null||message===null)return fail(res,400,'تحقق من الحقول المطلوبة وأطوالها');
+   const budget=str(d.budget,60)||'',timeline=str(d.timeline,60)||'';
    if(email&&!/^\S+@\S+\.\S+$/.test(email))return fail(res,400,'البريد الإلكتروني غير صالح');
    if(!/^[+()0-9\s.-]{6,40}$/.test(phone))return fail(res,400,'رقم الهاتف غير صالح');
-   const r=db.prepare('INSERT INTO messages(name,phone,email,type,message) VALUES(?,?,?,?,?)').run(name,phone,email,type,message);return send(res,201,{ok:true,id:Number(r.lastInsertRowid)});
+   const r=db.prepare('INSERT INTO messages(name,phone,email,type,message,budget,timeline) VALUES(?,?,?,?,?,?,?)').run(name,phone,email,type,message,budget,timeline);return send(res,201,{ok:true,id:Number(r.lastInsertRowid)});
   }
   if(path.startsWith('/api/admin/')||path==='/api/auth/password'){
    if(!requireAdmin(req,res))return;
@@ -205,29 +208,48 @@ const server=createServer(async(req,res)=>{
    }
    if(req.method==='POST'&&path==='/api/admin/backups'){
     const name=`hadir-backup-${new Date().toISOString().replace(/[:.]/g,'-')}-${randomBytes(3).toString('hex')}.sqlite`,file=resolve(BACKUP_DIR,name);await backup(db,file);
-    const files=(await readdir(BACKUP_DIR)).filter(x=>/^hadir-backup-[\dTZ-]+(?:-[a-f0-9]{6})?\.sqlite$/.test(x)).sort().reverse();for(const stale of files.slice(10))await unlink(resolve(BACKUP_DIR,stale));
+    const files=(await readdir(BACKUP_DIR)).filter(x=>/^hadir-(?:backup|auto)-[\dTZ-]+(?:-[a-f0-9]{6})?\.sqlite$/.test(x)).sort().reverse();for(const stale of files.slice(10))await unlink(resolve(BACKUP_DIR,stale));
     return send(res,201,{ok:true,name});
    }
    if(req.method==='GET'&&path==='/api/admin/backups'){
-    const files=(await readdir(BACKUP_DIR)).filter(x=>/^hadir-backup-[\dTZ-]+(?:-[a-f0-9]{6})?\.sqlite$/.test(x)).sort().reverse();return send(res,200,{items:files});
+    const files=(await readdir(BACKUP_DIR)).filter(x=>/^hadir-(?:backup|auto)-[\dTZ-]+(?:-[a-f0-9]{6})?\.sqlite$/.test(x)).sort().reverse();return send(res,200,{items:files});
    }
    if(req.method==='GET'&&path.startsWith('/api/admin/backups/')){
-    const name=path.slice('/api/admin/backups/'.length);if(basename(name)!==name||!/^hadir-backup-[\dTZ-]+(?:-[a-f0-9]{6})?\.sqlite$/.test(name))return fail(res,400,'اسم النسخة غير صالح');
+    const name=path.slice('/api/admin/backups/'.length);if(basename(name)!==name||!/^hadir-(?:backup|auto)-[\dTZ-]+(?:-[a-f0-9]{6})?\.sqlite$/.test(name))return fail(res,400,'اسم النسخة غير صالح');
     const file=resolve(BACKUP_DIR,name);if(!existsSync(file))return fail(res,404,'النسخة الاحتياطية غير موجودة');const stat=await import('node:fs/promises').then(fs=>fs.stat(file));res.writeHead(200,{'Content-Type':'application/vnd.sqlite3','Content-Disposition':`attachment; filename="${name}"`,'Content-Length':stat.size,'Cache-Control':'no-store'});return createReadStream(file).pipe(res);
    }
    return fail(res,404,'مسار الإدارة غير موجود');
   }
+  if(req.method==='GET'&&path==='/robots.txt'){const base=`https://${req.headers.host||'localhost'}`;res.writeHead(200,{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store'});return res.end(`User-agent: *\nAllow: /\nDisallow: /admin.html\nDisallow: /uploads/\n\nSitemap: ${base}/sitemap.xml\n`);}
+  if(req.method==='GET'&&path==='/sitemap.xml'){const base=`https://${req.headers.host||'localhost'}`;res.writeHead(200,{'Content-Type':'application/xml; charset=utf-8','Cache-Control':'no-store'});return res.end(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${base}/</loc></url></urlset>`);}
   if(req.method==='GET'){
    const requestedName=path.split('/').at(-1)||'';
    if(path.split('/').some(part=>part.startsWith('.'))||/^(?:.*\.(?:env|pem|key|p12|pfx|sqlite|db)|credentials(?:\..*)?|secrets?(?:\..*)?)$/i.test(requestedName))return fail(res,404,'الملف غير موجود');
    const file=path==='/'?resolve(PUBLIC_DIR,'index.html'):resolve(PUBLIC_DIR,'.'+path);
    if(file!==PUBLIC_DIR&&!file.startsWith(PUBLIC_DIR+sep))return fail(res,403,'ممنوع');
-   if(!existsSync(file))return fail(res,404,'الملف غير موجود');
+   if(!existsSync(file)){
+    if((req.headers.accept||'').includes('text/html')){
+     const notFound=resolve(PUBLIC_DIR,'404.html');
+     if(existsSync(notFound)){res.writeHead(404,{'Content-Type':mime['.html'],'Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});return createReadStream(notFound).pipe(res);}
+    }
+    return fail(res,404,'الملف غير موجود');
+   }
    res.writeHead(200,{'Content-Type':mime[extname(file).toLowerCase()]||'application/octet-stream','X-Content-Type-Options':'nosniff','Cache-Control':extname(file).toLowerCase()==='.html'?'no-store':'public, max-age=300'});return createReadStream(file).pipe(res);
   }
   return fail(res,404,'المسار غير موجود');
  }catch(e){console.error(e);if(!res.headersSent)return fail(res,e.status||500,e.status?e.message:'خطأ داخلي في الخادم');res.destroy();}
 });
 if(!['127.0.0.1','localhost','::1'].includes(HOST)&&db.prepare('SELECT COUNT(*) n FROM admins').get().n===0&&!SETUP_SECRET)throw new Error('Set HADIR_SETUP_SECRET before exposing first-run setup on a public interface.');
+
+async function autoBackup(){
+ try{
+  const stamp=new Date().toISOString().replace(/[:.]/g,'-'),file=resolve(BACKUP_DIR,`hadir-auto-${stamp}-${randomBytes(3).toString('hex')}.sqlite`);
+  await backup(db,file);
+  const autos=(await readdir(BACKUP_DIR)).filter(x=>/^hadir-auto-[\dTZ-]+(?:-[a-f0-9]{6})?\.sqlite$/.test(x)).sort().reverse();
+  for(const stale of autos.slice(7))await unlink(resolve(BACKUP_DIR,stale));
+ }catch(e){console.error('auto backup failed:',e.message);}
+}
+setTimeout(autoBackup,60_000);
+setInterval(autoBackup,24*60*60*1000).unref();
 server.listen(PORT,HOST,()=>console.log(`Hadir ready: http://${HOST}:${PORT} | SQLite: ${DB_PATH}`));
 for(const sig of ['SIGINT','SIGTERM'])process.on(sig,()=>server.close(()=>{db.close();process.exit(0);}));

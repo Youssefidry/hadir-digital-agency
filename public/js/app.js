@@ -23,6 +23,7 @@ async function initSite() {
     const waHref=waDigits?('https://wa.me/'+waDigits):'';
     document.querySelectorAll('.js-whatsapp').forEach(el=>{el.textContent=settings.whatsapp||'';const line=el.closest('.contact-line');if(line){if(waHref){const a=document.createElement('a');a.className='contact-text js-whatsapp';a.href=waHref;a.target='_blank';a.rel='noopener';a.textContent=settings.whatsapp;el.replaceWith(a);}line.hidden=!waHref;}});
     const waFloat=document.getElementById('waFloat');if(waFloat){waFloat.hidden=!waHref;if(waHref)waFloat.href=waHref;}
+    const waDirect=document.getElementById('waDirect');if(waDirect){waDirect.hidden=!waHref;if(waHref)waDirect.href=waHref;}
     document.querySelectorAll('.js-address').forEach(el=>{el.textContent=settings.address||'';const line=el.closest('.contact-line');if(line)line.hidden=!settings.address;});
     const contactNote=document.querySelector('.contact-setup-note');
     if(contactNote)contactNote.hidden=Boolean(settings.phone||settings.email||settings.address);
@@ -59,7 +60,7 @@ async function initSite() {
     button.textContent='جارٍ إرسال طلبك…';
     try{
       const f=new FormData(form);
-      await HadirAPI.request('/api/messages',{method:'POST',body:JSON.stringify({name:f.get('name'),phone:f.get('phone'),email:f.get('email'),type:f.get('type'),msg:f.get('msg')})});
+      await HadirAPI.request('/api/messages',{method:'POST',body:JSON.stringify({name:f.get('name'),phone:f.get('phone'),email:f.get('email'),type:f.get('type'),budget:f.get('budget'),timeline:f.get('timeline'),msg:f.get('msg')})});
       form.reset();
       setNotice('شكراً لك، وصل طلبك وحُفظ بنجاح. سنراجعه ونتواصل معك.','success');
       toast?.scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
