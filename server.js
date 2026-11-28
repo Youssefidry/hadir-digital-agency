@@ -189,6 +189,7 @@ const server=createServer(async(req,res)=>{
    if(req.method==='GET'&&path==='/api/admin/settings')return send(res,200,{settings:settingsObject()});
    if(req.method==='PUT'&&path==='/api/admin/settings'){
     const d=await readBody(req),fields=['siteName','tagline','phone','email','whatsapp','address','about'],values={};for(const k of fields){values[k]=str(d[k],k==='about'?500:180,k==='siteName');if(values[k]===null)return fail(res,400,`قيمة غير صالحة: ${k}`);}
+    for(const k of ['section_services','section_works','section_why','section_process','section_faq']){const v=str(d[k],1);if(v===null||(v&&v!=='0'&&v!=='1'))return fail(res,400,`قيمة غير صالحة: ${k}`);if(v)values[k]=v;}
     for(const k of ['logo','favicon']){const v=str(d[k],1000);if(v===null)return fail(res,400,`قيمة غير صالحة: ${k}`);if(v&&!/^\/uploads\/[a-f0-9]{36}\.(?:png|jpg|webp|gif)$/.test(v))return fail(res,400,`${k==='logo'?'الشعار':'أيقونة الصفحة'} يجب أن تكون صورة مرفوعة من اللوحة`);if(v&&!existsSync(resolve(PUBLIC_DIR,'.'+v)))return fail(res,400,'ملف الصورة المرفوعة غير موجود');values[k]=v;}
     if(values.email&&!/^\S+@\S+\.\S+$/.test(values.email))return fail(res,400,'البريد الإلكتروني غير صالح');
     const stmt=db.prepare('INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value');db.exec('BEGIN');try{for(const[k,v]of Object.entries(values))stmt.run(k,v);db.exec('COMMIT');}catch(e){db.exec('ROLLBACK');throw e;}return send(res,200,{ok:true});

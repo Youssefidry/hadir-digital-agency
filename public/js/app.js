@@ -28,6 +28,16 @@ async function initSite() {
     if(contactNote)contactNote.hidden=Boolean(settings.phone||settings.email||settings.address);
     document.querySelectorAll('.js-about').forEach(el=>{el.textContent=settings.about||'';el.hidden=!settings.about;});
     const logoUrl=settings.logo||'';if(logoUrl)document.querySelectorAll('.logo-mark img').forEach(img=>{img.src=logoUrl;});
+    const sectionMap={
+      section_services:['#services','header a[href="#services"]','footer a[href="#services"]'],
+      section_works:['#works','header a[href="#works"]','footer a[href="#works"]'],
+      section_why:['#why','header a[href="#why"]','header a[href="#contact"]'],
+      section_process:['#process','header a[href="#process"]','footer a[href="#process"]'],
+      section_faq:['#faq','header a[href="#faq"]']
+    };
+    for(const [key,selectors] of Object.entries(sectionMap)){
+      if(settings[key]==='0')selectors.forEach(sel=>document.querySelectorAll(sel).forEach(el=>{el.hidden=true;}));
+    }
     const iconLink=document.querySelector('link[rel="icon"]');if(iconLink&&settings.favicon)iconLink.href=settings.favicon;
     const svcGrid=document.getElementById('svcGrid');
     if(svcGrid){const colors=['svc-1','svc-2','svc-3','svc-4','svc-5','svc-6'];svcGrid.innerHTML=services.length?services.map(x=>`<article class="svc ${colors[(x.id-1+colors.length)%colors.length]||'svc-1'}"><div class="ic">${esc(x.icon||'✨')}</div><h3>${esc(x.title)}</h3><p>${esc(x.desc)}</p></article>`).join(''):'<p class="empty-state">سيتم الإعلان عن الخدمات قريباً.</p>';}

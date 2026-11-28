@@ -50,12 +50,19 @@ async function showAdmin(){
 }
 $('logoutBtn').addEventListener('click',async()=>{try{await AdminAPI.request('/api/auth/logout',{method:'POST'});}catch{}location.reload();});
 
-const titles={dashboard:'لوحة المعلومات',messages:'الرسائل',services:'إدارة الخدمات',projects:'إدارة الأعمال',settings:'إعدادات الموقع'};
+const titles={dashboard:'لوحة المعلومات',messages:'الرسائل',services:'إدارة الخدمات',projects:'إدارة الأعمال',sections:'التحكم بالأقسام',settings:'إعدادات الموقع'};
+const SECTIONS=[
+  {key:'section_services',title:'قسم الخدمات',desc:'شبكة بطاقات الخدمات المعرّضة للزوار'},
+  {key:'section_works',title:'قسم الأعمال التوضيحية',desc:'معرض نماذج التصميم مع شريط التمرير'},
+  {key:'section_why',title:'قسم التعريف ونموذج التواصل',desc:'خصائص الموقع ونموذج طلب عرض السعر'},
+  {key:'section_process',title:'قسم آلية العمل',desc:'خطوات العمل الأربع بخطها الزمني'},
+  {key:'section_faq',title:'قسم الأسئلة الشائعة',desc:'الأسئلة وعرض سعر سريع'}
+];
 document.querySelectorAll('.side-link').forEach(btn=>btn.addEventListener('click',async()=>{
   document.querySelectorAll('.side-link').forEach(x=>x.classList.toggle('active',x===btn));
   document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===`view-${btn.dataset.view}`));
   $('pageTitle').textContent=titles[btn.dataset.view];
-  try{if(btn.dataset.view==='messages')await loadDashboard();if(btn.dataset.view==='services')await loadServices();if(btn.dataset.view==='projects')await loadProjects();if(btn.dataset.view==='settings')await loadSettings();}catch(e){notice(e.message);}
+  try{if(btn.dataset.view==='messages')await loadDashboard();if(btn.dataset.view==='services')await loadServices();if(btn.dataset.view==='projects')await loadProjects();if(btn.dataset.view==='sections')renderSections();if(btn.dataset.view==='settings')await loadSettings();}catch(e){notice(e.message);}
 }));
 async function loadAll(){await Promise.all([loadDashboard(),loadServices(),loadProjects(),loadSettings()]);}
 async function loadDashboard(){
@@ -114,6 +121,9 @@ function applyBrand(){const DEFAULT_ICON='/assets/hadir-icon.svg';const logo=sta
   document.querySelectorAll('.brand-name').forEach(el=>{if(el.closest('.side-brand'))el.textContent=state.settings.siteName||'Hadir';});
   const link=document.querySelector('link[rel="icon"]');if(link)link.href=icon;
 }
+function sectionOn(key){return state.settings[key]!=='0';}
+function renderSections(){const el=$('sectionToggles');el.innerHTML=SECTIONS.map(s=>{const on=sectionOn(s.key);return `<div class="toggle-row"><span class="toggle-info"><b>${escAdmin(s.title)}</b><small>${escAdmin(s.desc)}</small></span><button class="switch ${on?'on':''}" type="button" role="switch" aria-checked="${on}" aria-label="تفعيل ${escAdmin(s.title)}" data-section="${s.key}"></button></div>`}).join('');}
+$('sectionToggles').addEventListener('click',async e=>{const b=e.target.closest('.switch');if(!b)return;const key=b.dataset.section,wasOn=sectionOn(key);b.classList.toggle('on',!wasOn);b.setAttribute('aria-checked',String(!wasOn));try{await saveSettings({...settingsPayload(),[key]:wasOn?'0':'1'},wasOn?'تم إخفاء القسم من الموقع':'تم تفعيل القسم');}catch(err){notice(err.message);b.classList.toggle('on',wasOn);b.setAttribute('aria-checked',String(wasOn));}});
 function settingsPayload(){const s={};for(const [key,id]of Object.entries({siteName:'settingSiteName',tagline:'settingTagline',phone:'settingPhone',email:'settingEmail',whatsapp:'settingWhatsapp',address:'settingAddress',about:'settingAbout'}))s[key]=$(id).value.trim();s.logo=state.settings.logo||'';s.favicon=state.settings.favicon||'';return s;}
 async function saveSettings(payload,message){await AdminAPI.request('/api/admin/settings',{method:'PUT',body:JSON.stringify(payload)});state.settings={...state.settings,...payload};applyBrand();if(message)notice(message);}
 $('settingsForm').addEventListener('submit',async e=>{e.preventDefault();try{await saveSettings(settingsPayload(),'تم حفظ إعدادات الموقع');}catch(err){notice(err.message);}});
