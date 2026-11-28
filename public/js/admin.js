@@ -48,7 +48,37 @@ async function showAdmin(){
   $('loginScreen').style.display='none';$('app').style.display='block';$('adminName').textContent=`مرحباً، ${state.username}`;const av=$('userAvatar');if(av)av.textContent=(state.username[0]||'ح').toUpperCase();
   try{await loadAll();await loadBackups();}catch(error){notice(error.message);}
 }
-$('logoutBtn').addEventListener('click',async()=>{try{await AdminAPI.request('/api/auth/logout',{method:'POST'});}catch{}location.reload();});
+$('logoutMenuBtn').addEventListener('click',async()=>{try{await AdminAPI.request('/api/auth/logout',{method:'POST'});}catch{}location.reload();});
+
+// قائمة الحساب المنسدلة (الشريحة أعلى اليسار)
+function setUserMenu(open){$('userDropdown').classList.toggle('hidden',!open);$('userChip').setAttribute('aria-expanded',String(open));}
+$('userChip').addEventListener('click',e=>{e.stopPropagation();setUserMenu($('userDropdown').classList.contains('hidden'));});
+document.addEventListener('click',e=>{if(!e.target.closest||!e.target.closest('.user-menu-wrap'))setUserMenu(false);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setUserMenu(false);});
+
+// نافذة إعدادات الحساب (اسم المستخدم + كلمة المرور)
+function openProfile(){setUserMenu(false);$('profileUsername').value=state.username;$('profileCurrentPassword').value='';$('profileNewPassword').value='';$('profileConfirmPassword').value='';$('profileModal').classList.add('open');setTimeout(()=>$('profileCurrentPassword').focus(),50);}
+function closeProfile(){$('profileModal').classList.remove('open');}
+$('profileMenuBtn').addEventListener('click',openProfile);
+$('profileModalClose').addEventListener('click',closeProfile);
+$('profileCancel').addEventListener('click',closeProfile);
+$('profileModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeProfile();});
+$('profileForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+ const currentPassword=$('profileCurrentPassword').value,newUsername=$('profileUsername').value.trim(),newPassword=$('profileNewPassword').value,confirm=$('profileConfirmPassword').value;
+ if(newUsername===state.username&&!newPassword)return notice('لا يوجد أي تغيير للحفظ');
+ if(newPassword||confirm){
+  if(newPassword.length<12)return notice('كلمة المرور الجديدة يجب أن تكون 12 حرفاً على الأقل');
+  if(newPassword!==confirm)return notice('كلمتا المرور غير متطابقتين');
+ }
+ const btn=e.target.querySelector('button[type=submit]');btn.disabled=true;
+ try{
+  const data=await AdminAPI.request('/api/admin/profile',{method:'POST',body:JSON.stringify({currentPassword,username:newUsername!==state.username?newUsername:'',newPassword})});
+  state.username=data.username;$('adminName').textContent=`مرحباً، ${state.username}`;$('userAvatar').textContent=(state.username[0]||'ح').toUpperCase();
+  closeProfile();notice(data.passwordChanged?'تم حفظ التغييرات، وتم تحديث كلمة المرور ✅':'تم حفظ التغييرات ✅');
+ }catch(error){notice(error.message);}
+ finally{btn.disabled=false;}
+});
 
 const titles={dashboard:'لوحة المعلومات',messages:'الرسائل',services:'إدارة الخدمات',projects:'إدارة الأعمال',sections:'التحكم بالأقسام',settings:'إعدادات الموقع'};
 const SECTIONS=[

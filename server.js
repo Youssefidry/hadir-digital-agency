@@ -247,6 +247,38 @@ const server=createServer(async(req,res)=>{
     for(const[token,sessionData]of sessions)if(sessionData.username===row.username)sessions.delete(token);
     const token=randomBytes(32).toString('base64url');sessions.set(token,{username:row.username,expires:Date.now()+SESSION_TTL});return send(res,200,{ok:true},{'Set-Cookie':setCookie(token)});
    }
+   if(req.method==='POST'&&path==='/api/admin/profile'){
+    const d=await readBody(req),current=typeof d.currentPassword==='string'?d.currentPassword:'';
+    let newUsername=typeof d.username==='string'?d.username.trim():'';
+    const newPassword=typeof d.newPassword==='string'?d.newPassword:'';
+    const row=db.prepare('SELECT * FROM admins WHERE username=?').get(session(req).username);
+    if(!row)return fail(res,401,'الحساب غير موجود');
+    if(!current)return fail(res,400,'أدخل كلمة المرور الحالية للتأكيد');
+    if(!timingSafeEqual(scryptSync(current,row.password_salt,64),Buffer.from(row.password_hash,'hex')))return fail(res,400,'كلمة المرور الحالية غير صحيحة');
+    if(newUsername.length>40)return fail(res,400,'اسم المستخدم: 3 إلى 40 حرفاً إنجليزياً أو أرقاماً');
+    let username=row.username,changePassword=false;
+    if(newUsername&&newUsername!==row.username){
+     if(!/^[A-Za-z0-9_.-]{3,40}$/.test(newUsername))return fail(res,400,'اسم المستخدم: 3 إلى 40 حرفاً إنجليزياً أو أرقاماً');
+     if(db.prepare('SELECT 1 FROM admins WHERE username=? AND id<>?').get(newUsername,row.id))return fail(res,409,'اسم المستخدم مستخدم مسبقاً');
+     username=newUsername;
+    }
+    if(newPassword){
+     if(newPassword.length<12)return fail(res,400,'كلمة المرور الجديدة يجب أن تكون 12 حرفاً على الأقل');
+     if(newPassword===current)return fail(res,400,'اختر كلمة مرور مختلفة عن الحالية');
+     changePassword=true;
+    }
+    if(username===row.username&&!changePassword)return fail(res,400,'لا يوجد أي تغيير للحفظ');
+    if(changePassword){
+     const salt=randomBytes(16).toString('hex'),hash=scryptSync(newPassword,salt,64).toString('hex');
+     db.prepare('UPDATE admins SET username=?,password_hash=?,password_salt=? WHERE id=?').run(username,hash,salt,row.id);
+     for(const[token,sessionData]of sessions)if(sessionData.username===row.username||sessionData.username===username)sessions.delete(token);
+     const token=randomBytes(32).toString('base64url');sessions.set(token,{username,expires:Date.now()+SESSION_TTL});
+     return send(res,200,{ok:true,username,passwordChanged:true},{'Set-Cookie':setCookie(token)});
+    }
+    db.prepare('UPDATE admins SET username=? WHERE id=?').run(username,row.id);
+    for(const sessionData of sessions.values())if(sessionData.username===row.username)sessionData.username=username;
+    return send(res,200,{ok:true,username,passwordChanged:false});
+   }
    if(req.method==='POST'&&path==='/api/admin/backups'){
     const name=`hadir-backup-${new Date().toISOString().replace(/[:.]/g,'-')}-${randomBytes(3).toString('hex')}.sqlite`,file=resolve(BACKUP_DIR,name);await backup(db,file);
     const files=(await readdir(BACKUP_DIR)).filter(x=>/^hadir-(?:backup|auto)-[\dTZ-]+(?:-[a-f0-9]{6})?\.sqlite$/.test(x)).sort().reverse();for(const stale of files.slice(10))await unlink(resolve(BACKUP_DIR,stale));

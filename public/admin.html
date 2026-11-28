@@ -5,7 +5,7 @@
 <meta name="robots" content="noindex,nofollow"><title>لوحة الإدارة | Hadir</title>
 <link rel="icon" href="/assets/hadir-icon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/admin.css?v=3">
+<link rel="stylesheet" href="/css/admin.css?v=4">
 </head>
 <body>
 <section class="login-screen" id="loginScreen">
@@ -34,10 +34,10 @@
       <button class="side-link" data-view="sections" aria-label="الأقسام"><span>🎚️</span><span class="link-text">الأقسام</span></button>
       <button class="side-link" data-view="settings" aria-label="الإعدادات"><span>⚙️</span><span class="link-text">الإعدادات</span></button>
     </nav>
-    <div class="side-bottom"><a class="btn btn-plain" href="/" target="_blank"><span>🌐</span><span class="link-text">معاينة الموقع</span></a><button class="btn btn-plain" id="logoutBtn"><span>🚪</span><span class="link-text">تسجيل الخروج</span></button></div>
+    <div class="side-bottom"><a class="btn btn-plain" href="/" target="_blank"><span>🌐</span><span class="link-text">معاينة الموقع</span></a></div>
   </aside>
   <main class="workspace">
-    <header class="topbar"><h1 id="pageTitle">لوحة المعلومات</h1><div class="user-chip"><span class="user-avatar" id="userAvatar"></span><small id="adminName"></small></div></header>
+    <header class="topbar"><h1 id="pageTitle">لوحة المعلومات</h1><div class="user-menu-wrap"><button class="user-chip" id="userChip" aria-haspopup="true" aria-expanded="false" aria-label="قائمة الحساب"><span class="user-avatar" id="userAvatar"></span><small id="adminName"></small><span class="user-caret" aria-hidden="true">▾</span></button><div class="user-dropdown hidden" id="userDropdown" role="menu"><button class="user-dd-item" id="profileMenuBtn" role="menuitem"><span>👤</span> إعدادات الحساب</button><button class="user-dd-item user-dd-logout" id="logoutMenuBtn" role="menuitem"><span>🚪</span> تسجيل الخروج</button></div></div></header>
     <section class="view active" id="view-dashboard">
       <div class="stats">
         <article class="stat-card"><span class="stat-icon">📨</span><span><strong id="statMessages">0</strong><small>إجمالي الرسائل</small></span></article>
@@ -55,6 +55,7 @@
   </main>
 </div>
 <div class="modal-backdrop" id="messageModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><article class="modal"><button class="modal-x" id="modalClose" aria-label="إغلاق">×</button><h2 id="modalTitle">تفاصيل الرسالة</h2><div id="modalContent"></div><div class="modal-foot"><button class="btn btn-plain" id="modalDone">إغلاق</button><button class="btn btn-danger" id="modalDelete">🗑️ حذف</button></div></article></div>
+<div class="modal-backdrop" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle"><article class="modal"><button class="modal-x" id="profileModalClose" aria-label="إغلاق">×</button><h2 id="profileTitle">👤 إعدادات الحساب</h2><p class="panel-help">عدّل اسم المستخدم أو كلمة المرور. كل تغيير يتطلب تأكيد كلمة المرور الحالية.</p><form id="profileForm" class="edit-form"><div class="field wide"><label for="profileUsername">اسم المستخدم</label><input id="profileUsername" maxlength="40" autocomplete="username"><small class="field-help">3 إلى 40 حرفاً إنجليزياً أو أرقاماً — يُستخدم لتسجيل الدخول.</small></div><div class="field wide"><label for="profileCurrentPassword">كلمة المرور الحالية (للتأكيد)</label><input id="profileCurrentPassword" type="password" autocomplete="current-password" required></div><div class="field wide"><label for="profileNewPassword">كلمة مرور جديدة (اختياري)</label><input id="profileNewPassword" type="password" autocomplete="new-password" minlength="12" maxlength="200" placeholder="اتركه فارغاً لعدم التغيير"><small class="field-help">12 حرفاً على الأقل. عند التغيير تُسجَّل خروج كل الجلسات الأخرى.</small></div><div class="field wide"><label for="profileConfirmPassword">تأكيد كلمة المرور الجديدة</label><input id="profileConfirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="200"></div><div class="form-actions"><button class="btn btn-primary" type="submit">💾 حفظ التغييرات</button><button class="btn btn-plain" type="button" id="profileCancel">إلغاء</button></div></form></article></div>
 <div class="notice" id="notice" role="status"></div>
-<script src="/js/admin.js?v=5" defer></script>
+<script src="/js/admin.js?v=6" defer></script>
 </body></html>
