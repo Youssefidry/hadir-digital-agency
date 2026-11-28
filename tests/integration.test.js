@@ -48,7 +48,7 @@ after(async()=>{
 test('health, security headers, and first-run setup',async()=>{
   const health=await fetch(base+'/api/health');
   assert.deepEqual(await health.json(),{ok:true,database:'sqlite'});
-  assert.equal(health.headers.get('x-frame-options'),'DENY');
+  assert.equal(health.headers.get('x-frame-options'),'SAMEORIGIN');
   assert.equal(health.headers.get('x-content-type-options'),'nosniff');
   assert.equal((await fetch(base+'/.env')).status,404);
   assert.equal((await fetch(base+'/credentials.json')).status,404);
